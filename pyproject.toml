@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weft"
+version = "0.1.0"
+description = "Weft: schemas, derived migrations with compatibility proofs, and typed data pipelines."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Brent Gordon" }]
+keywords = ["programming-language", "compiler", "ai-agents", "verification"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Compilers",
+]
+dependencies = ["canon>=0.1.0"]
+
+[project.urls]
+Homepage = "https://github.com/ExposingTheBadge/weft"
+Changelog = "https://github.com/ExposingTheBadge/weft/blob/main/CHANGELOG.md"
+
+[project.scripts]
+weft = "weft.cli:main"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
