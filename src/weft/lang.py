@@ -445,7 +445,11 @@ class Lowering:
             name=s.type_name,
             doc=s.doc,
             intent=s.intent or f"{s.name}, schema version {s.version}.",
-            fields=[A.Param(name=f.name, ty=f.ty, doc=f.doc, span=f.span)
+            # The field default carries through to the generated record, so a
+            # field added to a schema does not break every literal that
+            # constructs one.
+            fields=[A.Param(name=f.name, ty=f.ty, doc=f.doc,
+                            default=f.default, span=f.span)
                     for f in s.fields],
             invariants=list(s.invariants),
             classification={f.name: f.classification
