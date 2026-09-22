@@ -1,29 +1,29 @@
 """
-Weft: schemas, versioned migrations, and data pipelines.
+weft, schemas and versioned migrations and data pipelines.
 
-The problem Weft exists to solve is that a schema change is two changes -- the
-new shape and the path from the old one -- and the second is usually written by
-hand, later, by someone who no longer remembers the first. Weft derives what it
-can and refuses what it cannot:
+a schema change is really two changes, the new shape and the path from the old
+one to it, and the second one usually gets written by hand later by somebody
+who has forgotten what the first one was for. this works out what it can and
+refuses the rest.
 
-  * A migration must account for every field that differs between two versions.
-    A field added without a value, or removed without a way back, is a compile
-    error naming the field. The compiler knows what changed; the author should
-    not have to.
+a migration has to account for every field that differs between two versions,
+and a field added with no value or removed with no way back is a compile error
+naming it, since the compiler already knows what changed and nobody should have
+to work that out again by hand.
 
-  * A migration that cannot be reversed must say `lossy` and say why. Otherwise
-    Weft generates both directions and attaches an `invertible_by` law, so the
-    round trip is checked by the verifier against generated records rather than
-    asserted in a comment.
+a migration that cannot be reversed has to say `lossy` and say why. otherwise
+both directions get generated with an `invertible_by` law on them, so the
+verifier runs the round trip against generated records instead of somebody
+asserting it in a comment.
 
-  * Field classifications survive migration. A field marked `personal` in v2 is
-    still `personal` in v3 unless the migration explicitly reclassifies it, so
-    a rename cannot quietly launder protected data.
+classifications survive a migration. a field marked `personal` in v2 is still
+`personal` in v3 unless the migration reclassifies it on purpose, so renaming
+something does not quietly launder protected data.
 
-Pipelines lower to ordinary functions, plus a lineage record: which fields
-flowed from which source to which sink, and the highest data classification
-that passed through. That artifact is generated from the code rather than
-maintained alongside it, so it cannot drift.
+pipelines lower to ordinary functions plus a lineage record, which fields went
+from which source to which sink and the highest classification that passed
+through. it comes off the code rather than being kept next to it, so it cannot
+drift.
 """
 
 from __future__ import annotations

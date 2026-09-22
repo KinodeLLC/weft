@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "weft"
 version = "0.1.0"
-description = "Weft: schemas, derived migrations with compatibility proofs, and typed data pipelines."
+description = "schemas, versioned migrations with the round trip verified, and pipelines with lineage off the code."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }

@@ -1,14 +1,14 @@
 """
-Weft: schemas, versioned migrations, and data pipelines.
+weft, schemas and versioned migrations and data pipelines.
 
-A migration must account for every field that differs between two schema
-versions, must declare itself lossy if it cannot be reversed, and must not
-weaken a field's data classification. Reversible migrations get both directions
-generated and an `invertible_by` law attached, so the round trip is checked by
-the verifier rather than asserted.
+a migration has to account for every field that differs between two versions,
+has to say `lossy` if it cannot be reversed, and cannot weaken a field's
+classification. reversible ones get both directions generated with an
+`invertible_by` law on them so the verifier runs the round trip instead of
+somebody asserting it.
 
-Pipelines lower to functions plus a derived lineage record: which fields flowed
-where, and the highest classification that passed through.
+pipelines lower to a function plus a lineage record, which fields went where
+and the highest classification that passed through.
 """
 
 __version__ = "0.1.0"

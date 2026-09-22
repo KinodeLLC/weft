@@ -1,16 +1,16 @@
 # Weft
 
-Schemas, versioned migrations, and data pipelines with derived lineage.
+schemas, versioned migrations, and pipelines whose lineage comes off the code.
 
-Part of the [Kinode](../kinode-stack) stack. Lowers to [Canon](../canon).
+part of [kinode](../kinode-stack). lowers to [canon](../canon).
 
-## Install
+## install
 
 ```sh
 pip install -e .
 ```
 
-## Schemas and a migration
+## example
 
 ```weft
 module customers
@@ -43,14 +43,15 @@ migrate Applicant v1 -> v2 {
 }
 ```
 
-## The problem it solves
+## migrations
 
-A schema change is two changes — the new shape, and the path from the old one —
-and the second is usually written by hand, later, by someone who no longer
-remembers the first. Weft derives what it can and refuses what it cannot.
+a schema change is two changes, the new shape and the path from the old one to
+it, and the second one usually gets written by hand later by somebody who has
+forgotten what the first one was for. weft works out what it can and refuses the
+rest
 
-**Every differing field must be accounted for.** The compiler knows exactly
-which fields changed, so the diagnostic names them:
+every field that differs between two versions has to be accounted for. the
+compiler already knows which ones differ so the error names them
 
 ```
 error[CANON-E0102]: migration Applicant v1 -> v2 does not supply a value for segment
@@ -58,35 +59,33 @@ error[CANON-E0102]: migration Applicant v1 -> v2 does not supply a value for seg
   try: forward segment = <expression over old>
 ```
 
-**An irreversible migration must say so.** Otherwise it is an error, because
-whether a migration can be rolled back determines whether a bad deployment can
-be:
+if you drop a field and there is no way to get it back you have to write `lossy`
+and say why, otherwise it is an error, because whether a migration can be
+reversed is whether a bad deploy can be rolled back
 
 ```
 error[CANON-E0102]: migration Applicant v1 -> v2 removes display_name without
                     a way to restore it
   try: backward display_name = <expression over new>
   try: or declare the migration irreversible and say why
-       migrate Applicant v1 -> v2 lossy "reason"
 ```
 
-**Reversible migrations are verified, not asserted.** Both directions are
-generated with an `invertible_by` law attached, so the round trip is checked
-against generated records:
+migrations that can be reversed get both directions generated with an
+`invertible_by` law attached, so the verifier runs the round trip against
+generated records instead of you asserting somewhere that it works
 
 ```
 ok  the round trip is checked by the verifier, not asserted:
     invertible_by verified over 40 generated records
 ```
 
-**Classifications cannot weaken.** A field `personal` in v1 cannot be `public`
-in v2, so a rename or reshape cannot launder protected data.
+a field classified `personal` in v1 cannot come out `public` in v2, so renaming
+or reshaping a field does not launder protected data
 
-**Field defaults carry into the generated record**, so adding a field with a
-default is a non-breaking change rather than an edit to every literal that
-constructs one.
+field defaults carry into the generated record, so adding a field with a default
+does not break every literal that builds one
 
-## Pipelines
+## pipelines
 
 ```weft
 pipeline income_band_report(rows: List<ApplicantV2>) -> Int
@@ -101,27 +100,26 @@ pipeline income_band_report(rows: List<ApplicantV2>) -> Int
 }
 ```
 
-A pipeline lowers to a function plus a **lineage record**: which fields flowed
-from which source to which sink, and the highest data classification that
-passed through. Derived from the stages, so it cannot drift from the code.
+a pipeline gives you a function plus a lineage record, which fields went from
+which source to which sink and the highest classification that passed through
+it. it comes off the stages so it cannot drift away from the code
 
-## What it produces
+## output
 
-For the schemas above:
+| generated | what it is |
+| --- | --- |
+| `record ApplicantV1`, `record ApplicantV2` | classifications, invariants and defaults kept |
+| `fn migrate_applicant_v1_v2` | v1 to v2 |
+| `fn rollback_applicant_v2_v1` | v2 back to v1, only if it is reversible |
+| `const applicant_v1_v2_compatibility` | `"reversible"` or `"lossy"` |
+| `const income_band_report_lineage` | the field level lineage |
 
-- `record ApplicantV1`, `record ApplicantV2` with classifications, invariants
-  and defaults preserved
-- `fn migrate_applicant_v1_v2(old: ApplicantV1) -> ApplicantV2`
-- `fn rollback_applicant_v2_v1(new: ApplicantV2) -> ApplicantV1`
-- `const applicant_v1_v2_compatibility: Text` — `"reversible"` or `"lossy"`
-- `const income_band_report_lineage: Lineage`
-
-## Tests
+## tests
 
 ```sh
 python tests/smoke_weft.py
 ```
 
-## Licence
+## licence
 
-Apache-2.0. Copyright Kinode.
+Apache-2.0, Kinode.
