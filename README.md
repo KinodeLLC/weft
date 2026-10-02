@@ -2,7 +2,7 @@
 
 schemas, versioned migrations, and pipelines whose lineage comes off the code.
 
-part of [kinode](../kinode-stack). lowers to [canon](../canon).
+part of [kinode](https://github.com/KinodeLLC/kinode-stack). lowers to [canon](https://github.com/KinodeLLC/canon).
 
 ## install
 
